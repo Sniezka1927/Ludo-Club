@@ -209,4 +209,13 @@ class Ui {
     }
     console.log(data);
   };
+
+  displayTimer = (remainStatus) => {
+    const timerCont = document.querySelector(".gameStatus");
+    if (remainStatus == "finished") {
+      timerCont.innerText = "Poczekaj na swoją kolej.";
+    } else {
+      timerCont.innerText = `Twoja kolej! Zostało ${remainStatus}s`;
+    }
+  };
 }

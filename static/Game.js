@@ -14,6 +14,9 @@ class Game {
     this.previousPos = {};
     this.currentPos = {};
     this.gameModeSettings = 0;
+    this.startTimer;
+    this.remainTime = 15;
+    this.timerStatus = false;
 
     this.redPawnsLeft = this.gameModeSettings;
     this.bluePawnsLeft = this.gameModeSettings;
@@ -380,9 +383,11 @@ class Game {
               break;
             case "green":
               this.checkIfIsItInSpawn(clickedPawn, pawnColor, data);
+
               break;
             case "yellow":
               this.checkIfIsItInSpawn(clickedPawn, pawnColor, data);
+
               break;
           }
         }
@@ -697,6 +702,7 @@ class Game {
       playerThreeTurn: playerThreeTurn,
       playerFourTurn: playerFourTurn,
     };
+    this.stopTimer();
     net.sendRoundStatus(turnsObject);
   };
 
@@ -720,7 +726,6 @@ class Game {
   };
 
   checkWin = (gameState) => {
-    console.log(this.redPawnsLeft, this.bluePawnsLeft);
     if (this.redPawnsLeft == this.gameModeSettings) {
       alert("Red Won!");
       let winner = "red";
@@ -758,6 +763,34 @@ class Game {
     }, 3000);
   };
 
+  timer = (data) => {
+    this.timerStatus = true;
+    this.startTimer = setInterval(() => {
+      console.log(this.remainTime);
+      this.remainTime--;
+      ui.displayTimer(this.remainTime);
+      if (this.remainTime == 0) {
+        ui.displayTimer("finished");
+        clearInterval(this.startTimer);
+        setTimeout(() => {
+          this.timerStatus = false;
+          this.changeDiceGraphic();
+        }, 1000);
+        this.remainTime = 15;
+        this.finishRound(data);
+      }
+    }, 1000);
+  };
+
+  stopTimer = () => {
+    ui.displayTimer("finished");
+    clearInterval(this.startTimer);
+    setTimeout(() => {
+      this.timerStatus = false;
+      this.changeDiceGraphic();
+    }, 1000);
+    this.remainTime = 15;
+  };
   assignMoveOrder = async (data) => {
     data = JSON.parse(data);
     let gameState = data.isGameUp;
@@ -807,6 +840,7 @@ class Game {
       if (srcArray[srcArray.length - 1] == "timer.png")
         diceContainer.innerHTML =
           "<img class='dice' src='./img/cube/dices.png'>";
+      if (this.timerStatus == false) this.timer(data);
       this.rollDice(data);
     } else if (playerTwoTurn == true && playerColor == "niebieskimi") {
       // console.log("moja kolej!");
@@ -816,6 +850,7 @@ class Game {
       if (srcArray[srcArray.length - 1] == "timer.png")
         diceContainer.innerHTML =
           "<img class='dice' src='./img/cube/dices.png'>";
+      if (this.timerStatus == false) this.timer(data);
       this.rollDice(data);
     } else if (playerThreeTurn == true && playerColor == "zielonymi") {
       // console.log("moja kolej!");
@@ -825,6 +860,7 @@ class Game {
       if (srcArray[srcArray.length - 1] == "timer.png")
         diceContainer.innerHTML =
           "<img class='dice' src='./img/cube/dices.png'>";
+      if (this.timerStatus == false) this.timer(data);
       this.rollDice(data);
     } else if (playerFourTurn == true && playerColor == "zoltymi") {
       // console.log("moja kolej!");
@@ -834,6 +870,7 @@ class Game {
       if (srcArray[srcArray.length - 1] == "timer.png")
         diceContainer.innerHTML =
           "<img class='dice' src='./img/cube/dices.png'>";
+      if (this.timerStatus == false) this.timer(data);
       this.rollDice(data);
     }
   };
